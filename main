@@ -1,0 +1,82 @@
+#include "mbed.h"
+#include <iostream>
+using namespace std;
+//LEADS
+PwmOut VOut(PTD1); //Choosing LED as output format
+PwmOut VOut2(PTD3);
+PwmOut AOut(PTD2); //Different LED's to show different leads
+PwmOut AOut2(PTD0);
+
+void VOO(int LRL,float VPW, float VAR);
+void AOO(int LRL,float APW, float AAR);
+void DOO(int LRL,float APW,float AAR,float VPW,float VAR, int FAVD);
+
+int main()
+{
+//ALL
+    int LRL = 60; //LowerRateLimit 60ppm
+    int URL = 120; //UpperRateLimit 120ppm
+    float APW = 0.4; //ArtrialPulseWidth 0.4ms
+    float VPW = 0.4; //VentriclePulseWidth 0.4ms
+    int FAVD = 150; // FixedAtrial-VentricularDelay 150ms
+//LEADS
+    float VAR = 3.5;
+    float AAR = 3.5;
+//WHILE
+    int BOM = 1;
+    while (true) {
+        if (BOM == 0) {
+//Off
+        } else if (BOM == 1) {
+            for (int i = 0; i < 10; i++) {
+                DOO(LRL,APW,AAR,VPW,VAR,FAVD); //VAR is for LEADS
+            }
+            for (int j = 0; j < 10; j++) {
+                DOO(110,0.8,3.5,0.8,2,500); //4.5 is for LEADS
+            }
+        }
+    }
+}
+void VOO(int LRL,float VPW, float VAR) //function for VOO
+{
+    float VAR2;
+    wait_ms(60000/LRL);
+    VAR2 = VAR/6.6;
+    VOut = VAR2;
+    VOut2 = VAR2;
+    wait_ms(VPW*1000);
+    VOut = 0;
+    VOut2 = 0;
+}
+void AOO(int LRL,float APW,float AAR) //function for AOO
+{
+    float AAR2;
+    wait_ms(60000/LRL);
+    AAR2 = AAR/6.6;
+    AOut = AAR2;
+    AOut2 = AAR2;
+    wait_ms(APW*1000);
+    AOut=0;
+    AOut2 = 0;
+}
+void DOO(int LRL,float APW,float AAR,float VPW,float VAR, int FAVD)
+{
+    float AAR2;
+    float VAR2;
+    AAR2 = AAR/6.6;
+    VAR2 = VAR/6.6;
+    wait_ms(60000/LRL);
+    AOut = AAR2;
+    AOut2 = AAR2;
+    wait_ms(APW*1000);
+    AOut=0;
+    AOut2 = 0;
+    wait_ms(FAVD);
+    VOut = VAR2;
+    VOut2 = VAR2;
+    wait_ms(VPW*1000);
+    VOut = 0;
+    VOut2 = 0;
+}
+
+void paceNow()
